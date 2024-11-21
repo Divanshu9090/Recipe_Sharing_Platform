@@ -1,10 +1,9 @@
 import React from 'react';
-import '../About.css'
+import '../css/About.css'
 import insta from '../assets/social.png'
 import fb from '../assets/facebook.png'
 import twitter from '../assets/twitter.png'
 import pin from '../assets/logo.png'
-
 import banana from '../assets/veg/banana.png'
 import capsicum from '../assets/veg/capsicum.png'
 import carrot from '../assets/veg/carrot.png'
@@ -12,14 +11,12 @@ import cauliflower from '../assets/veg/cauliflower.png'
 import mango from '../assets/veg/mango.png'
 import tomato from '../assets/veg/tomato.png'
 
-
-
 function AboutUs() {
   return (
     <>
-      <div className="about-us-container">
-        <div className="top">
-          <div className="about-us-text">
+      <div id="about-us-container">
+        <div id="top">
+          <div id="about-us-text">
             <h1>About Us</h1>
             <br />
             <p>
@@ -44,10 +41,10 @@ function AboutUs() {
               </svg> <p>Get It On <br /> Google Play</p></button>
             </div>
           </div>
-          <div className="learn-more">
+          <div id="learn-more">
             <h1>Learn More</h1>
             <br />
-            <div className="link">
+            <div id="link">
               <a href="https://cookbook.ai/community" target="_blank" rel="noopener noreferrer">CookBook Community</a>
               <a href="https://cookbook.ai/feedback" target="_blank" rel="noopener noreferrer">Feedback</a>
               <a href="https://cookbook.ai/blog" target="_blank" rel="noopener noreferrer">Blog</a>

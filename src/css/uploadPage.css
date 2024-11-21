@@ -1,74 +1,163 @@
-/* src/css/uploadPage.css */
-
 .upload-page {
-    padding: 20px;
+    padding: 40px 20px;
     display: flex;
     flex-direction: column;
+    margin: 40px;
+    width: 300vw;
     min-height: calc(100vh - 60px);
-    /* Assuming NavBar height is 60px */
     justify-content: flex-start;
     align-items: center;
-    width: 80vw;
+    background-color: #f9f9fb;
+    font-family: 'Arial', sans-serif;
 }
 
-h2{
-    font-size: 30px;
-    margin-bottom: 20px;
+h2 {
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #34495e;
+    text-align: center;
 }
+
 .upload-form {
-    max-width: 500px;
+    max-width: 600px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .form-section {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 10px;
 }
 
-.form-section label{
-    font-size: 20px;
+.form-section label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2c3e50;
 }
 
 .form-section input[type="text"],
 .form-section input[type="number"],
 .form-section textarea {
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 12px 15px;
+    border: 1px solid #dcdde1;
     border-radius: 5px;
     font-size: 1em;
+    color: #2c3e50;
+    background-color: #f9f9fb;
+    transition: all 0.3s ease;
+}
+
+.form-section input[type="text"]:focus,
+.form-section input[type="number"]:focus,
+.form-section textarea:focus {
+    border-color: #3498db;
+    background-color: #ffffff;
+    outline: none;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-section textarea {
+    resize: vertical;
+    min-height: 100px;
 }
 
 .tags-section {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
+}
+
+.tags-section input[type="text"] {
+    padding: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.tags-section button {
+    padding: 10px 15px;
+    font-size: 1em;
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.tags-section button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+.tags-section button:active {
+    transform: translateY(0px);
 }
 
 .tags-container {
     display: flex;
-    gap: 5px;
+    gap: 10px;
     flex-wrap: wrap;
     margin-top: 10px;
 }
 
 .tag {
-    background-color: #ddd;
-    padding: 5px 10px;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 8px 12px;
     border-radius: 20px;
     font-size: 0.9em;
+    cursor: default;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .submit-button {
-    padding: 10px;
-    font-size: 1.1em;
-    background-color: #a38928;
-    /* Customize your button color */
-    color: white;
+    padding: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: #e67e22;
+    color: #ffffff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submit-button:hover {
+    background-color: #d35400;
+    transform: translateY(-2px);
+}
+
+.submit-button:active {
+    transform: translateY(0px);
+}
+
+@media screen and (max-width: 768px) {
+    .upload-page {
+        padding: 20px;
+    }
+
+    .upload-form {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 1.8em;
+    }
+
+    .form-section label {
+        font-size: 1em;
+    }
+
+    .submit-button {
+        font-size: 1em;
+    }
 }

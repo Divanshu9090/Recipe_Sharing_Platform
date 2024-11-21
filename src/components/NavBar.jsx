@@ -6,7 +6,7 @@ import plus from "../assets/plus.png";
 
 function NavBar({ onPlusClick }) {
     return (
-        <div className="nav">
+        <div className="nav" style={{backgroundColor:"black", height:"70px"}}>
             <div className="logo">
                 <img src={cook} alt="Cooking" />
             </div>

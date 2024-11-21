@@ -1,0 +1,30 @@
+.homes {
+    width: 100%;
+    height: 500px;
+    font-size: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(../assets/coff.jpg); /* Add your background image here */
+    background-size: cover; /* Ensure the image covers the container */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat;
+    position: relative; /* Ensure proper stacking context */
+    z-index: 1; /* Place above other sections if necessary */
+}
+
+.search {
+    position: absolute;
+    margin-top: 2%;
+    width: 40%;
+    padding-left: 1%;
+    font-size: 0.2em;
+    background-color: rgba(0, 0, 0, 0.8); /* Add transparency */
+    color: white;
+    border: none;
+    outline: none;
+}
+
+.search::placeholder {
+    color: white;
+}

@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
 import '../css/uploadPage.css';
 import About from './about.jsx';
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import app from "../utils/firebase.js"
 
-function UploadPage({ selectedCategory }) {
+//getting firebase instance
+const db = getFirestore(app);
+//funtion to upload data on firestore
+export const uploadSingleDocument= async (collectionName, documentId, data) => {
+    try {
+      const docRef = doc(db, collectionName, documentId); // Set the document ID
+      await setDoc(docRef, data); // Upload the document
+      console.log("Document uploaded successfully:", documentId);
+    } catch (error) {
+      console.error("Error uploading document:", error);
+    }
+  };
+
+
+function UploadPage({ selectedCategory,setShowUploadPage }) {
     const [photos, setPhotos] = useState([]);
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
@@ -26,8 +42,28 @@ function UploadPage({ selectedCategory }) {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        console.log({ photos, recipeName, ingredients, procedure, calorieCount, nutritionValues, tags });
-    };
+      
+        // Form data
+        const data = {
+          photos: "https://handletheheat.com/wp-content/uploads/2018/02/BAKERY-STYLE-CHOCOLATE-CHIP-COOKIES-9.jpg",
+          recipeName,
+          ingredients,
+          procedure,
+          calorieCount,
+          nutritionValues,
+          tags,
+        };
+      
+        // Check if data is valid
+        console.log(data); // Log the object to debug if needed
+      
+        if (data) {
+          // Specify the document ID (optional: generate a unique ID if needed)
+          const documentId = data.recipeName.toLowerCase().replace(/\s+/g, "_"); // e.g., "chocolate_chip_cookies"
+          uploadSingleDocument("recipe", documentId, data);
+          setShowUploadPage(false);
+        }
+      };
 
     return (
         <div className="upload-page">
@@ -115,7 +151,7 @@ function UploadPage({ selectedCategory }) {
                     </div>
                 </div>
 
-                <button type="submit" className="submit-button">Post Recipe</button>
+                <button type="submit" className="submit-button" onClick={()=>handleFormSubmit}>Post Recipe</button>
             </form>
         </div>
     );
