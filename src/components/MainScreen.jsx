@@ -9,13 +9,13 @@ import { auth } from "../utils/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
 import "../home.css";
 
-function MainScreen() { 
+function MainScreen() {
   const [user, setUser] = useState("no usr");
   const [showCategory, setShowCategory] = useState(false);
   const [showUploadPage, setShowUploadPage] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [homeSearch, setHomeSearch] = useState(true);
-     
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setUser(user ? user : null);
@@ -33,6 +33,9 @@ function MainScreen() {
     setShowUploadPage(true);
   };
 
+  const heandleUserClick=()=>{
+    setHomeSearch(!homeSearch)
+  }
   return (
     <div className="main-screen home">
       <NavBar onPlusClick={handleCategoryClick} />

@@ -1,69 +1,141 @@
 import React, { useState } from 'react';
-import '../css/uploadPage.css';
-import About from './about.jsx';
+import '../css/UploadPage.css';
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-import app from "../utils/firebase.js"
+import app from "../utils/firebase.js";
+import cloudinaryConfig from '../utils/cloudinaryConfig';
+import { auth, db } from '../utils/firebase';
 
-//getting firebase instance
-const db = getFirestore(app);
-//funtion to upload data on firestore
-export const uploadSingleDocument= async (collectionName, documentId, data) => {
+// Function to upload a single document to Firestore
+export const uploadSingleDocument = async (collectionName, documentId, data) => {
     try {
-      const docRef = doc(db, collectionName, documentId); // Set the document ID
-      await setDoc(docRef, data); // Upload the document
-      console.log("Document uploaded successfully:", documentId);
+        const docRef = doc(db, collectionName, documentId); // Set the document ID
+        await setDoc(docRef, data); // Upload the document
+        console.log("Document uploaded successfully:", documentId);
     } catch (error) {
-      console.error("Error uploading document:", error);
+        console.error("Error uploading document:", error);
     }
-  };
+};
 
 
-function UploadPage({ selectedCategory,setShowUploadPage }) {
-    const [photos, setPhotos] = useState([]);
+async function uploadToCloudinary(file) {
+    const { CLOUDINARY_URL, UPLOAD_PRESET } = cloudinaryConfig;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+        const response = await fetch(CLOUDINARY_URL, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to upload file: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.secure_url; // Return the uploaded file's URL
+    } catch (error) {
+        console.error("Error uploading file to Cloudinary:", error);
+        throw error;
+    }
+}
+
+function UploadPage({ selectedCategory, setShowUploadPage, user }) {
+    const [photos, setPhotos] = useState([]); // Array of files to upload
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [procedure, setProcedure] = useState('');
     const [calorieCount, setCalorieCount] = useState('');
     const [nutritionValues, setNutritionValues] = useState('');
     const [tags, setTags] = useState([]);
+    const [uploadedUrls, setUploadedUrls] = useState([]); // Array of uploaded file URLs
+    const [uploading, setUploading] = useState(false);
 
+    // Handle file selection
     const handlePhotoUpload = (event) => {
         const files = Array.from(event.target.files);
-        setPhotos((prevPhotos) => [...prevPhotos, ...files.slice(0, 5 - photos.length)]);
+        setPhotos((prevPhotos) => [...prevPhotos, ...files.slice(0, 5 - prevPhotos.length)]);
     };
 
+    // Handle adding a tag
     const handleTagAdd = () => {
-        const newTag = document.getElementById("tagInput").value;
+        const newTag = document.getElementById("tagInput").value.trim();
         if (newTag && !tags.includes(newTag)) {
             setTags((prevTags) => [...prevTags, newTag]);
             document.getElementById("tagInput").value = ""; // Clear the input
         }
     };
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-      
-        // Form data
-        const data = {
-          photos: "https://handletheheat.com/wp-content/uploads/2018/02/BAKERY-STYLE-CHOCOLATE-CHIP-COOKIES-9.jpg",
-          recipeName,
-          ingredients,
-          procedure,
-          calorieCount,
-          nutritionValues,
-          tags,
-        };
-      
-        // Check if data is valid
-        console.log(data); // Log the object to debug if needed
-      
-        if (data) {
-          // Specify the document ID (optional: generate a unique ID if needed)
-          const documentId = data.recipeName.toLowerCase().replace(/\s+/g, "_"); // e.g., "chocolate_chip_cookies"
-          uploadSingleDocument("recipe", documentId, data);
-          setShowUploadPage(false);
+
+
+    // Upload all selected photos
+    const uploadAllFiles = async () => {
+        if (photos.length === 0) {
+            alert("No files to upload!");
+            return;
         }
-      };
+
+        setUploading(true);
+        try {
+            const urls = await Promise.all(photos.map((file) => uploadToCloudinary(file)));
+            setUploadedUrls(urls);
+            console.log("Uploaded File URLs:", urls);
+            alert("All files uploaded successfully!");
+            setPhotos([]); // Clear the file array after upload
+        } catch (error) {
+            console.error("Error uploading files:", error);
+            alert("Error uploading files.");
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    // Handle form submission
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!recipeName.trim() || !ingredients.trim() || !procedure.trim()) {
+            alert("Please fill out all required fields.");
+            return;
+        }
+
+        setUploading(true);
+
+        try {
+            // Ensure photos are uploaded first
+            const urls = await Promise.all(photos.map((file) => uploadToCloudinary(file)));
+            setUploadedUrls(urls); // Update state with uploaded URLs
+
+            // Form data
+            const data = {
+                userId: auth.currentUser.uid,
+                photos: urls, // Use the URLs directly from the upload result
+                recipeName,
+                ingredients,
+                procedure,
+                calorieCount,
+                nutritionValues,
+                tags,
+                category: selectedCategory,
+            };
+
+            // Generate a unique document ID
+            const documentId = recipeName.toLowerCase().replace(/\s+/g, "_");
+
+            // Upload the data to Firestore
+            await uploadSingleDocument("recipes", documentId, data);
+
+            // Hide the upload page and reset form state
+            setShowUploadPage(false);
+            alert("Recipe uploaded successfully!");
+        } catch (error) {
+            console.error("Error during form submission:", error);
+            alert("Error uploading recipe. Please try again.");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     return (
         <div className="upload-page">
@@ -138,11 +210,7 @@ function UploadPage({ selectedCategory,setShowUploadPage }) {
                 {/* Recipe Tags */}
                 <div className="form-section tags-section">
                     <label>Recipe Tags</label>
-                    <input
-                        id="tagInput"
-                        type="text"
-                        placeholder="Add a tag"
-                    />
+                    <input id="tagInput" type="text" placeholder="Add a tag" />
                     <button type="button" onClick={handleTagAdd}>+</button>
                     <div className="tags-container">
                         {tags.map((tag, index) => (
@@ -151,7 +219,9 @@ function UploadPage({ selectedCategory,setShowUploadPage }) {
                     </div>
                 </div>
 
-                <button type="submit" className="submit-button" onClick={()=>handleFormSubmit}>Post Recipe</button>
+                <button type="submit" className="submit-button" disabled={uploading}>
+                    {uploading ? "Uploading..." : "Post Recipe"}
+                </button>
             </form>
         </div>
     );

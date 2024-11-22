@@ -1,153 +1,108 @@
-#signupdetail{
+/* General container styles */
+#SignupDetail-content {
+    margin: 0;
+    padding: 0;
+    background-color: #D9D9D9;
+    font-family: Arial, sans-serif; /* Ensures a modern and clean font */
+}
+
+/* Navigation bar */
+#SignupDetail-content > nav {
+    height: 50px;
+    background-color: rgb(13, 30, 50);
     display: flex;
-    justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-#signupdetail .form-container {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    padding: 20px;
-}
-
-#signupdetail form {
-    display: flex;
-    flex-direction: column;
-}
-
-#signupdetail h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #0077ff;
-}
-
-/* Image Upload Styles */
-#signupdetail .image-upload {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#signupdetail .image-upload-label {
-    display: inline-block;
-    background-color: #0077ff;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-#signupdetail .image-upload-label:hover {
-    background-color: #005bb5;
-}
-
-#signupdetail .image-preview img {
-    max-width: 150px;
-    border-radius: 50%;
-    margin: 10px 0;
-}
-
-#changeImageButton {
-    background-color: #ff5722;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#changeImageButton:hover {
-    background-color: #e64a19;
-}
-
-/* Fieldset and Input Styles */
-#signupdetailfieldset {
-    border: none;
-    margin-bottom: 20px;
-}
-
-#signupdetail legend {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-#signupdetail label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-#signupdetail input,
-textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    resize: none;
-    border-color: #0077ff;
-    outline: none;
-    box-shadow: 0 0 3px rgba(0, 119, 255, 0.3);
-}
-
-#signupdetail textarea {
-    height: 80px;
-}
-
-/* Radio Button Group */
-#signupdetail .radio-group {
-    display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
 }
 
-#signupdetail .radio-group label {
-    display: flex;
-    align-items: center;
-}
-
-#signupdetail .radio-group input {
-    margin-right: 5px;
-}
-
-/* Button Styles */
-#signupdetail button {
-    background-color: #0077ff;
+.nav-container {
+    margin: 0;
+    text-align: center;
     color: white;
-    font-size: 16px;
-    padding: 10px 20px;
-    border: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#SignupDetail-content .form-container {
+    width: 70%;
+    height: auto;
+    margin: 20px auto;
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 8px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+}
+
+.image-upload{
+    width: 100%;
+    text-align: center;
+}
+
+/* Typography and fieldset */
+#SignupDetail-content legend,
+#SignupDetail-content span,
+#SignupDetail-content fieldset {
+    color: rgb(13, 30, 50);
+}
+
+fieldset {
+    font-size: 24px;
+    margin: 40px 0;
+    padding: 20px;
+    border: 1px solid #ddd; /* Clean and subtle border */
     border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-#signupdetail button:hover {
-    background-color: #005bb5;
-}
-
-/* Warning Styles */
-#signupdetail .warning {
-    font-size: 12px;
-    color: red;
-    margin-top: -10px;
+fieldset label{
+    font-size: 15px;
+    padding-left: 20px;
+    display: inline-block;
     margin-bottom: 10px;
 }
 
-/* Responsive Design */
+#profileImage {
+    display: none; 
+}
+
+.image-preview{
+    text-align: center;
+}
+fieldset .radio-group{
+    display: inline;
+}
+#SignupDetail-content .form-container button{
+    margin: 0 32.5%;
+}
+
+#hidden{
+    display: inline-block;
+    color: white;
+    padding:5px 20px;
+    margin-bottom: 25px;
+    background-color: #34495e;
+    border-radius: 5px;
+}
+
+.hidden{
+    display: none;
+}
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    #signupdetail .form-container {
-        padding: 15px;
+    .form-container {
+        width: 90%; /* Reduces width on smaller screens */
+        padding: 15px 20px;
     }
 
-    #signupdetail button {
-        width: 100%;
+    fieldset {
+        font-size: 20px;
+    }
+
+    fieldset label {
+        font-size: 14px;
+        padding-left: 10px;
+    }
+
+    .nav-container {
+        font-size: 16px;
     }
 }

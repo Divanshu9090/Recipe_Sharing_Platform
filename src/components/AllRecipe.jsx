@@ -1,13 +1,15 @@
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-import app from "../utils/firebase"; // Adjust the path to your Firebase initialization file
-
-const db = getFirestore(app);
 import RecipeDetail from "./RecipeDetail";
 import React, { useEffect, useState } from "react";
+import app from "../utils/firebase"; // Adjust the path to your Firebase initialization file
+import "../css/allReciipe.css"
+import m from '../assets/like.png'
+import updateFieldByDocumentField from "../utils/updateLike"
 
+const db = getFirestore(app);
 export const fetchRecipes = async () => {
   try {
-    const recipesCollection = collection(db, "recipe");
+    const recipesCollection = collection(db, "recipes");
     const snapshot = await getDocs(recipesCollection);
 
     // Extract data from each document
@@ -23,9 +25,18 @@ export const fetchRecipes = async () => {
   }
 };
 
+
+
+
 const AllRecipe = ({ homeSearch }) => {
   const [recipes, setRecipes] = useState([]);
-  const [selectedRecipeId, setSelectedRecipeId] = useState(null); // Track selected recipe ID
+  const [selectedRecipeId, setSelectedRecipeId] = useState(null);
+
+
+function like(userId){
+  console.log(userId)
+  updateFieldByDocumentField("userId",userId,"like","n")
+}
 
   useEffect(() => {
     const loadRecipes = async () => {
@@ -37,61 +48,34 @@ const AllRecipe = ({ homeSearch }) => {
   }, []);
 
   if (selectedRecipeId) {
-    // Render RecipeDetail if a recipe is selected
     return (
       <RecipeDetail
         showDetail={setSelectedRecipeId}
         id={selectedRecipeId}
-        homeSearch={homeSearch(false)} // This should be set to false when showing details
-        setHomeSearch={homeSearch} // Pass the setHomeSearch function here
+        homeSearch={homeSearch(false)}
+        setHomeSearch={homeSearch}
       />
     );
   }
 
   return (
-    <div style={styles.gridContainer}>
+    <div className="grid-container">
       {recipes.map((recipe) => (
         <div
           key={recipe.id}
-          style={styles.card}
-          onClick={() => setSelectedRecipeId(recipe.id)} // Pass ID to RecipeDetail
-        >
-          <img src={recipe.photos} alt={recipe.recipeName} style={styles.image} />
-          <h3 style={styles.title}>{recipe.recipeName}</h3>
+          className="card"
+          >
+          <img  className="like" src={m} alt="" onClick={(event) => {
+      event.stopPropagation(); // Prevent event bubbling
+      like(recipe.userId); // Call the like function
+    }}/>
+          <img src={recipe.photos[0]} alt={recipe.recipeName} className="image"  onClick={() => setSelectedRecipeId(recipe.id)}></img>
+          <h3 className="title" onClick={() => setSelectedRecipeId(recipe.id)}>{recipe.recipeName} </h3>
+          <hr  className="all-recipe-hr"/>
         </div>
       ))}
     </div>
   );
-};
-
-const styles = {
-  gridContainer: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "20px",
-    padding: "20px",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    overflow: "hidden",
-    textAlign: "center",
-    padding: "15px",
-    cursor: "pointer",
-    textDecoration: "none",
-  },
-  image: {
-    width: "100%",
-    height: "200px",
-    objectFit: "cover",
-    borderRadius: "4px",
-  },
-  title: {
-    margin: "10px 0",
-    fontSize: "18px",
-    fontWeight: "bold",
-  },
 };
 
 export default AllRecipe;
