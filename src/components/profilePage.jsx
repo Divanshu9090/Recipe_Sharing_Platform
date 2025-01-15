@@ -1,54 +1,60 @@
 import React, { useEffect, useState } from "react";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import "../css/profilePage.css"; 
-import { db } from '../utils/firebase';
-import insta from '../assets/social.png';
-import fb from '../assets/facebook.png';
-import pin from '../assets/logo.png';
-import RecipeDetail from './RecipeDetail'; // Import the RecipeDetail component
+import { doc, onSnapshot, collection, query, where } from "firebase/firestore";
+import "../css/profilePage.css";
+import { db } from "../utils/firebase";
+import insta from "../assets/social.png";
+import fb from "../assets/facebook.png";
+import pin from "../assets/logo.png";
+import RecipeDetail from "./RecipeDetail"; // Import the RecipeDetail component
+import profile from "../assets/profile.png";
+import backArrow from "../assets/backspace.png";
 
-function profilePage({ userId }) {
+function ProfilePage({ userId, onLogoClick }) {
     const [userData, setUserData] = useState(null);
     const [recipes, setRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedRecipeId, setSelectedRecipeId] = useState(null); // State for selected recipe
+    const [totalLikes, setTotalLikes] = useState(0); // State for total likes
+    const [followersCount, setFollowersCount] = useState(0); // State for followers count
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const userDoc = await getDoc(doc(db, "user", userId));
-                if (userDoc.exists()) {
-                    setUserData(userDoc.data());
-                } else {
-                    console.error("User not found");
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
+        const unsubscribeUser = onSnapshot(doc(db, "user", userId), (doc) => {
+            if (doc.exists()) {
+                setUserData(doc.data());
+            } else {
+                console.error("User not found");
+                setUserData(null);
             }
-        };
+        });
 
-        const fetchUserRecipes = async () => {
-            try {
-                const q = query(collection(db, "recipes"), where("userId", "==", userId));
-                const querySnapshot = await getDocs(q);
-                const recipesData = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setRecipes(recipesData);
-            } catch (error) {
-                console.error("Error fetching user recipes:", error);
+        const q = query(collection(db, "recipes"), where("userId", "==", userId));
+        const unsubscribeRecipes = onSnapshot(q, (querySnapshot) => {
+            const recipesData = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setRecipes(recipesData);
+
+            // Calculate total likes across all recipes
+            const totalLikes = recipesData.reduce((sum, recipe) => sum + (recipe.like || 0), 0);
+            setTotalLikes(totalLikes);
+        });
+
+        // Real-time listener for followers count
+        const unsubscribeFollowers = onSnapshot(
+            query(collection(db, "followers"), where("userId", "==", userId)),
+            (querySnapshot) => {
+                setFollowersCount(querySnapshot.size); // Real-time update of followers count
             }
-        };
+        );
 
-        const fetchData = async () => {
-            setLoading(true);
-            await fetchUserData();
-            await fetchUserRecipes();
-            setLoading(false);
-        };
+        setLoading(false);
 
-        fetchData();
+        return () => {
+            unsubscribeUser();
+            unsubscribeRecipes();
+            unsubscribeFollowers(); // Cleanup listener
+        };
     }, [userId]);
 
     if (loading) {
@@ -64,6 +70,7 @@ function profilePage({ userId }) {
         return (
             <RecipeDetail
                 id={selectedRecipeId}
+                user={userId} // Pass userId to RecipeDetail
                 showDetail={setSelectedRecipeId} // Function to clear the selected recipe
                 setHomeSearch={() => setSelectedRecipeId(null)} // Go back to the profile page
             />
@@ -73,8 +80,14 @@ function profilePage({ userId }) {
     // Main profile page content
     return (
         <div className="profile-page">
+            <button
+                className="back-button"
+                onClick={onLogoClick}
+            >
+                <img src={backArrow} alt="Back" className="back-arrow-icon" />
+            </button>
             <div className="userdetail">
-                <img src={userData.profileImage} alt={`${userData.firstname} ${userData.lastname}`} className="profile-image" />
+                <img src={userData.profileImage || profile} alt={`${userData.firstname} ${userData.lastname}`} className="profile-image" />
                 <div className="profile-header">
                     <h1>{userData.firstname} {userData.lastname}</h1>
                 </div>
@@ -95,15 +108,15 @@ function profilePage({ userId }) {
             </div>
             <div className="stats">
                 <div>
-                    <h2>{userData.likes || 0}</h2>
-                    <p>Likes</p>
+                    <h2>{totalLikes}</h2>
+                    <p>Total Likes</p>
                 </div>
                 <div>
-                    <h2>{userData.followers || 0}</h2>
+                    <h2>{followersCount}</h2>
                     <p>Followers</p>
                 </div>
                 <div>
-                    <h2>{userData.reviews || 0}</h2>
+                    <h2>{userData.reviewCount || 0}</h2>
                     <p>Reviews</p>
                 </div>
             </div>
@@ -127,4 +140,4 @@ function profilePage({ userId }) {
     );
 }
 
-export default profilePage;
+export default ProfilePage;

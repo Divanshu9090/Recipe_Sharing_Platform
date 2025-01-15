@@ -6,19 +6,20 @@ import About from "./about.jsx";
 import Category from "./category.jsx";
 import DataSection from "./DataSection.jsx";
 import UploadPage from "./UploadPage.jsx";
-import Profile from "./profilePage.jsx"; 
+import Profile from "./profilePage.jsx";
 import { auth } from "../utils/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
-import "../home.css";
+import "../css/home.css";
 
 function MainScreen() {
   const [user, setUser] = useState(null);
   const [showCategory, setShowCategory] = useState(false);
   const [showUploadPage, setShowUploadPage] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [searchTerm, setSearchTerm] = useState(""); // State to share search term
+  const [searchTerm, setSearchTerm] = useState("");
   const [homeSearch, setHomeSearch] = useState(true);
-  const [showProfile, setShowProfile] = useState(false); 
+  const [showProfile, setShowProfile] = useState(false);
+  const [isDetailVisible, setIsDetailVisible] = useState(false);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -31,6 +32,7 @@ function MainScreen() {
     setShowUploadPage(false);
     setShowProfile(false);
     setHomeSearch(true);
+    setSearchTerm(false);
   };
 
   const categoryHandled = (category) => {
@@ -38,48 +40,68 @@ function MainScreen() {
     setShowCategory(false);
     setShowProfile(false);
     setShowUploadPage(true);
+    setSearchTerm(false);
   };
+
   const handleUserClick = () => {
     setShowProfile(!showProfile);
-    setHomeSearch(false); 
+    setHomeSearch(false);
     setShowCategory(false);
     setShowUploadPage(false);
+    setSearchTerm(false);
   };
 
   const handleLogoClick = () => {
-    setHomeSearch(true); 
+    setHomeSearch(true);
     setShowProfile(false);
     setShowCategory(false);
     setShowUploadPage(false);
-  };
-
-  const toggleHomeSearch = () => {
-    setHomeSearch(!homeSearch);
+    setIsDetailVisible(false);
+    setSearchTerm(false);
   };
 
   return (
     <div className="main-screen home">
-      <NavBar onPlusClick={handleCategoryClick} onUserClick={handleUserClick} onLogoClick={handleLogoClick} />
+      <NavBar
+        onPlusClick={handleCategoryClick}
+        onUserClick={handleUserClick}
+        onLogoClick={handleLogoClick}
+      />
 
       <div className="content">
         {showCategory ? (
-          <Category clickHandle={categoryHandled} />
+          <Category 
+            clickHandle={categoryHandled}
+            setShowCategory={setShowCategory} 
+          />
         ) : showUploadPage ? (
           <UploadPage
             selectedCategory={selectedCategory}
             setShowUploadPage={setShowUploadPage}
+            setShowCategory={setShowCategory}
           />
-        ) : showProfile ? ( 
-          <Profile userId={user?.uid} />
+        ) : showProfile ? (
+          <Profile 
+            userId={user?.uid} 
+            onLogoClick={handleLogoClick}
+          />
         ) : (
           <>
             {user ? (
               <>
-                {homeSearch && (
+                {!isDetailVisible && homeSearch && (
                   <HomeSearchBlock setSearchTerm={setSearchTerm} />
                 )}
-                <AllRecipe searchQuery={searchTerm} homeSearch={setHomeSearch} user={user.uid}/>
-                {!homeSearch && <DataSection homeSearch={setHomeSearch} user={user.uid} />}
+                <AllRecipe
+                  searchQuery={searchTerm}
+                  homeSearch={setHomeSearch}
+                  user={user.uid}
+                  setDetailVisible={setIsDetailVisible}
+                  setSearchTerm={setSearchTerm}
+                />
+                {!homeSearch && !isDetailVisible && (
+                  <DataSection homeSearch={setHomeSearch} user={user.uid} />
+                )}
               </>
             ) : (
               <h1>You are not signed in</h1>
